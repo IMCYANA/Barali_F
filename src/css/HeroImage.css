@@ -1,0 +1,247 @@
+/* HeroImage.css - Luxury Minimalist Style */
+.hero-carousel-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.luxury-carousel {
+  position: relative;
+}
+
+.carousel-item-luxury {
+  position: relative;
+}
+
+.luxury-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.5) 0%,
+    rgba(0, 0, 0, 0.3) 20%,
+    rgba(0, 0, 0, 0.1) 40%,
+    transparent 70%
+  );
+  z-index: 1;
+}
+
+.luxury-caption {
+  position: absolute;
+  bottom: 50px;
+  left: 15%;
+  right: 15%;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 1.2s ease, transform 1.2s ease;
+  z-index: 2;
+  text-align: center;
+}
+
+.luxury-caption.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.luxury-title {
+  font-family: "Playfair Display", serif;
+  font-size: 46px;
+  font-weight: 300;
+  letter-spacing: 3px;
+  margin-bottom: 20px;
+  color: white;
+  text-transform: uppercase;
+}
+
+.luxury-divider {
+  width: 50px;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.7);
+  margin: 20px auto;
+}
+
+.luxury-description {
+  font-family: "Montserrat", sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+  letter-spacing: 1px;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.hero-carousel-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.custom-carousel {
+  position: relative;
+}
+
+.carousel-item-custom {
+  position: relative;
+}
+
+.image-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  z-index: 1;
+}
+
+.enhanced-caption {
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 800px;
+  width: 90%;
+  padding: 0;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 1s ease, transform 1s ease;
+  z-index: 2;
+}
+
+.enhanced-caption.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.caption-container {
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 8px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.caption-tag {
+  display: inline-block;
+  background-color: #ff6b6b;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.caption-title {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.caption-subtitle {
+  font-size: 24px;
+  font-weight: 400;
+  color: #f8f9fa;
+  margin-bottom: 15px;
+}
+
+.caption-divider {
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(to right, #ff6b6b, #ff9e40);
+  margin: 15px auto;
+}
+
+.caption-description {
+  font-size: 18px;
+  line-height: 1.6;
+  color: #e9ecef;
+  margin-bottom: 20px;
+}
+
+.caption-button {
+  background: linear-gradient(to right, #ff6b6b, #ff9e40);
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 10px;
+}
+
+.caption-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+}
+
+/* ปรับแต่ง indicators */
+.carousel-indicators {
+  bottom: 20px;
+}
+
+.carousel-indicators [data-bs-target] {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: 0 5px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+}
+
+.carousel-indicators .active {
+  width: 14px;
+  height: 14px;
+  background-color: #fff;
+}
+
+/* ปรับแต่งสำหรับมือถือ */
+@media (max-width: 768px) {
+  .caption-container {
+    padding: 15px;
+  }
+
+  .caption-title {
+    font-size: 28px;
+  }
+
+  .caption-subtitle {
+    font-size: 18px;
+  }
+
+  .caption-description {
+    font-size: 16px;
+  }
+
+  .enhanced-caption {
+    bottom: 30px;
+  }
+}
+
+@media (max-width: 576px) {
+  .caption-title {
+    font-size: 24px;
+  }
+
+  .caption-subtitle {
+    font-size: 16px;
+  }
+
+  .caption-description {
+    display: none; /* ซ่อนคำอธิบายในหน้าจอขนาดเล็ก */
+  }
+
+  .enhanced-caption {
+    bottom: 20px;
+  }
+}
