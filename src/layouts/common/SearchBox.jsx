@@ -111,7 +111,7 @@ export default function SearchBar({
               title={
                 <span>
                   <FaUserFriends className="me-2" />
-                  ผู้ใหญ่, เด็ก, ห้องพัก
+                  จำนวนผู้ใหญ่, เด็ก
                 </span>
               }
               variant="outline-secondary"
@@ -135,14 +135,14 @@ export default function SearchBar({
                   </Form.Select>
                 </Form.Group>
 
-                <Form.Group>
+                {/* <Form.Group>
                   <Form.Label>ห้องพัก (สูงสุด 5)</Form.Label>
                   <Form.Select value={rooms} onChange={e => setRooms(Number(e.target.value))}>
                     {[1, 2, 3, 4, 5].map(n => (
                       <option key={n} value={n}>{n}</option>
                     ))}
                   </Form.Select>
-                </Form.Group>
+                </Form.Group> */}
               </div>
             </DropdownButton>
           </Col>

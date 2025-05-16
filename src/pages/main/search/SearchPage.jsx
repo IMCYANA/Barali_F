@@ -178,7 +178,7 @@ const SearchPage = () => {
 
     return (
       <div className="d-flex align-items-baseline mb-2">
-        {typeof discountPercent === 'number' && discountPercent > 0 && (
+        {/* {typeof discountPercent === 'number' && discountPercent > 0 && (
           <>
             <span className="text-decoration-line-through text-secondary me-2">
               {originalPrice.toLocaleString()}
@@ -188,12 +188,12 @@ const SearchPage = () => {
             </span>
           </>
         )}
-        <span
+        {/* <span
           className={`h5 fw-bold ${discountPercent > 0 ? 'text-danger' : 'text-success'
             }`}
         >
           {discounted.toLocaleString()} บาท
-        </span>
+        </span> */} 
       </div>
     );
   };
@@ -251,8 +251,8 @@ const SearchPage = () => {
                             <Col key={acc.id} xs={12} className="mb-4">
                               <Card className="shadow-sm border-0" style={{ borderRadius: 12, background: '#f8fafd' }}>
                                 <Row className="g-0">
-                                  <Col md={5} className="d-flex flex-column align-items-center justify-content-center">
-                                    <div style={{ width: '100%', height: 280, overflow: 'hidden', borderRadius: '0 12px', background: '#f4f4f4' }}>
+                                  <Col md={5} className="d-flex flex-column align-items-start justify-content-center">
+                                    <div style={{ width: 326, height: 216, overflow: 'hidden', borderRadius: '10px', background: '#f4f4f4' }}>  
                                       <img
                                         src={acc.image_name ? `${BASE_URL}/uploads/accommodations/${acc.image_name}` : 'https://picsum.photos/id/57/2000/3000'}
                                         alt={acc.name}
@@ -277,15 +277,15 @@ const SearchPage = () => {
                                           </div>
                                           <div className="mb-1" style={{ fontSize: '0.98em' }}>
                                             <ul className='list-unstyled'>
-                                              {acc.amenities.split(",").map((amenity, index) => (
+                                              {/* {acc.amenities.split(",").map((amenity, index) => (
                                                 <li key={index}>{amenity.trim()}</li>
-                                              ))}
+                                              ))} */}
                                             </ul>
                                           </div>
-                                          <div className="mb-1" style={{ fontSize: '0.93em' }}>
+                                          {/* <div className="mb-1" style={{ fontSize: '0.93em' }}>
                                             <span className="fw-bold text-decoration-underline">Booking Condition</span> <br />
                                             <span>{acc.description}</span>
-                                          </div>
+                                          </div> */}
                                           <div className="d-flex align-items-center justify-content-between mt-2">
                                             <DiscountedPrice accommodation={acc} />
                                             {/* กล่องราคาจำลอง 3 กล่อง */}
@@ -302,7 +302,7 @@ const SearchPage = () => {
                                                         <span className="fw-bold text-success">2,250 บาท</span>
                                                       </div>
                                                     </div>
-                                                    <Button variant="primary" style={{ minWidth: 80, borderRadius: 20 }}>จอง</Button>
+                                                    <Button variant="primary" style={{ minWidth: 80, borderRadius: 10 }}>จอง</Button>
                                                   </div>
                                                 </Card>
                                               ))}
