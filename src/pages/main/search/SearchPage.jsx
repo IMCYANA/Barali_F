@@ -1,16 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Container, Row, Col, Card, Button, Form, Accordion, Badge } from 'react-bootstrap';
-import dayjs from 'dayjs';
-import 'dayjs/locale/th';
-import formatPrice from '../../../utils/formatPrice';
-import SearchBox from '../../../layouts/common/SearchBox';
-import AccommodationService from '../../../services/api/accommodation/accommodation.service';
-import TypeService from '../../../services/api/accommodation/type.service';
-import Slider from 'rc-slider';
-import 'rc-slider/assets/index.css';
-import FormatToBE from '../../../utils/FormatToBE';
-import GetRoomAvailability from '../../../components/common/GetRoomAvailability';
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Form,
+  Accordion,
+  Badge,
+} from "react-bootstrap";
+import dayjs from "dayjs";
+import "dayjs/locale/th";
+import formatPrice from "../../../utils/formatPrice";
+import SearchBox from "../../../layouts/common/SearchBox";
+import AccommodationService from "../../../services/api/accommodation/accommodation.service";
+import TypeService from "../../../services/api/accommodation/type.service";
+import Slider from "rc-slider";
+import "rc-slider/assets/index.css";
+import FormatToBE from "../../../utils/FormatToBE";
+import GetRoomAvailability from "../../../components/common/GetRoomAvailability";
+import { Icon } from "@iconify-icon/react";
+import "/src/css/SearchPage.css";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -31,10 +42,10 @@ const SearchPage = () => {
   // สร้าง ref เพื่อเก็บค่าวันที่เคยเรียกข้อมูลไปแล้ว
   // const prevDatesRef = useRef({ checkIn: null, checkOut: null });
 
-  const destination = searchParams.get('destination') || '';
-  const checkIn = searchParams.get('checkIn') || '';
-  const checkOut = searchParams.get('checkOut') || '';
-  const guests = searchParams.get('guests') || 1;
+  const destination = searchParams.get("destination") || "";
+  const checkIn = searchParams.get("checkIn") || "";
+  const checkOut = searchParams.get("checkOut") || "";
+  const guests = searchParams.get("guests") || 1;
 
   const checkInDate = checkIn ? dayjs(checkIn).toDate() : null;
   const checkOutDate = checkOut ? dayjs(checkOut).toDate() : null;
@@ -42,7 +53,7 @@ const SearchPage = () => {
   // Group accommodations by type
   const groupByType = (accommodations) => {
     return accommodations.reduce((groups, acc) => {
-      const typeName = acc.type?.name || 'Other';
+      const typeName = acc.type?.name || "Other";
       if (!groups[typeName]) {
         groups[typeName] = [];
       }
@@ -59,7 +70,7 @@ const SearchPage = () => {
           setTypes(response.data);
         }
       } catch (error) {
-        console.error('Error fetching accommodation types:', error);
+        console.error("Error fetching accommodation types:", error);
       }
     };
     fetchTypes();
@@ -71,13 +82,18 @@ const SearchPage = () => {
       setLoading(true);
       try {
         const res = destination
-          ? await AccommodationService.getSearch(destination, checkIn, checkOut, guests)
+          ? await AccommodationService.getSearch(
+              destination,
+              checkIn,
+              checkOut,
+              guests
+            )
           : await AccommodationService.getAll();
         const results = res?.data || [];
         setOriginalResults(results);
         setFilteredResults(results);
       } catch (error) {
-        console.error('Error fetching search results:', error);
+        console.error("Error fetching search results:", error);
       } finally {
         setLoading(false);
       }
@@ -87,23 +103,24 @@ const SearchPage = () => {
 
   useEffect(() => {
     const applyAllFilters = () => {
-      const {
-        priceRange,
-        breakfast,
-        freeCancel,
-        highRating,
-        selectedTypes,
-      } = filters;
+      const { priceRange, breakfast, freeCancel, highRating, selectedTypes } =
+        filters;
 
-      const filtered = originalResults.filter(acc => {
+      const filtered = originalResults.filter((acc) => {
         const price = acc.price_per_night || 0;
         const inPriceRange = price >= priceRange[0] && price <= priceRange[1];
         const matchBreakfast = !breakfast || acc.breakfastIncluded;
         const matchFreeCancel = !freeCancel || acc.freeCancellation;
         const matchHighRating = !highRating || (acc.rating && acc.rating >= 8);
-        const matchType = selectedTypes.length === 0 ||
-          selectedTypes.includes(acc.type?.name);
-        return inPriceRange && matchBreakfast && matchFreeCancel && matchHighRating && matchType;
+        const matchType =
+          selectedTypes.length === 0 || selectedTypes.includes(acc.type?.name);
+        return (
+          inPriceRange &&
+          matchBreakfast &&
+          matchFreeCancel &&
+          matchHighRating &&
+          matchType
+        );
       });
 
       setFilteredResults(filtered);
@@ -137,12 +154,12 @@ const SearchPage = () => {
 
   const handleTypeChange = (typeName) => {
     const newSelectedTypes = filters.selectedTypes.includes(typeName)
-      ? filters.selectedTypes.filter(t => t !== typeName)
+      ? filters.selectedTypes.filter((t) => t !== typeName)
       : [...filters.selectedTypes, typeName];
 
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      selectedTypes: newSelectedTypes
+      selectedTypes: newSelectedTypes,
     }));
   };
 
@@ -164,7 +181,7 @@ const SearchPage = () => {
     const originalPrice = accommodation.price_per_night;
     const discountPercent = accommodation.discount;
 
-    if (typeof discountPercent === 'number' && discountPercent > 0) {
+    if (typeof discountPercent === "number" && discountPercent > 0) {
       return Math.round(originalPrice * (1 - discountPercent / 100));
     }
 
@@ -178,7 +195,7 @@ const SearchPage = () => {
 
     return (
       <div className="d-flex align-items-baseline mb-2">
-        {/* {typeof discountPercent === 'number' && discountPercent > 0 && (
+        {typeof discountPercent === "number" && discountPercent > 0 && (
           <>
             <span className="text-decoration-line-through text-secondary me-2">
               {originalPrice.toLocaleString()}
@@ -188,23 +205,32 @@ const SearchPage = () => {
             </span>
           </>
         )}
-        {/* <span
-          className={`h5 fw-bold ${discountPercent > 0 ? 'text-danger' : 'text-success'
-            }`}
+        <span
+          className={`h5 fw-bold ${
+            discountPercent > 0 ? "text-danger" : "text-success"
+          }`}
         >
           {discounted.toLocaleString()} บาท
-        </span> */} 
+        </span>
       </div>
     );
   };
 
+  const promotions = [
+    { discount: 50, price: 2200 },
+    { discount: 42, price: 2208 },
+    { discount: 0, price: 2250 },
+  ];
   return (
-    <Container className='my-4'>
+    <Container className="my-4">
       <SearchBox resetFilter={resetFilters} />
-      <Row className='mt-4'>
-        <Col lg={3} className='mb-4'>
-          <Card className='p-3 shadow-sm border-0' style={{ background: '#EEFBFF' }}>
-            <h5 className='fw-bold mb-3'>ตัวกรอง</h5>
+      <Row className="mt-4">
+        <Col lg={3} className="mb-4">
+          <Card
+            className="p-3 shadow-sm border-0 "
+            style={{ background: "#EEFBFF" }}
+          >
+            <h5 className="fw-bold mb-3">ตัวกรอง</h5>
             {types.length > 0 && (
               <Form.Group className="mb-4">
                 <Form.Label>ประเภทที่พัก</Form.Label>
@@ -220,16 +246,24 @@ const SearchPage = () => {
                 ))}
               </Form.Group>
             )}
-
           </Card>
         </Col>
         <Col lg={9}>
-          <Card className='p-3 shadow-sm border-0' style={{ background: '#fff' }}>
-            <h5 className='fw-bold mb-3'>ผลการค้นหา </h5>
-            <div className="mb-2" style={{ color: '#888', fontSize: '1em' }}>
-              <span className="me-3">เช็คอิน: <b>{FormatToBE(checkIn) || 'ไม่ระบุ'}</b></span>
-              <span className="me-3">เช็คเอาท์: <b>{FormatToBE(checkOut) || 'ไม่ระบุ'}</b></span>
-              <span>จำนวนผู้เข้าพัก: <b>{guests}</b></span>
+          <Card
+            className="p-3 shadow-sm border-0"
+            style={{ background: "#fff" }}
+          >
+            <h5 className="fw-bold mb-3">ผลการค้นหา </h5>
+            <div className="mb-2" style={{ color: "#888", fontSize: "1em" }}>
+              <span className="me-3">
+                เช็คอิน: <b>{FormatToBE(checkIn) || "ไม่ระบุ"}</b>
+              </span>
+              <span className="me-3">
+                เช็คเอาท์: <b>{FormatToBE(checkOut) || "ไม่ระบุ"}</b>
+              </span>
+              <span>
+                จำนวนผู้เข้าพัก: <b>{guests}</b>
+              </span>
             </div>
             {loading ? (
               <div className="text-center py-5">
@@ -238,117 +272,186 @@ const SearchPage = () => {
               </div>
             ) : Object.keys(groupedVisibleResults).length > 0 ? (
               <>
-                <div className="mb-3 text-end text-secondary">พบ {visibleResults.length} รายการ</div>
-                <Accordion defaultActiveKey={Object.keys(groupedVisibleResults)} alwaysOpen>
-                  {Object.entries(groupedVisibleResults).map(([typeName, accommodations]) => (
-                    <Accordion.Item key={typeName} eventKey={typeName}>
-                      <Accordion.Header>
-                        <h5 className="mb-0">{typeName}</h5>
-                      </Accordion.Header>
-                      <Accordion.Body>
-                        <Row>
-                          {accommodations.map((acc) => (
-                            <Col key={acc.id} xs={12} className="mb-4">
-                              <Card className="shadow-sm border-0" style={{ borderRadius: 12, background: '#f8fafd' }}>
-                                <Row className="g-0">
-                                  <Col md={5} className="d-flex flex-column align-items-start justify-content-center">
-                                    <div style={{ width: 326, height: 216, overflow: 'hidden', borderRadius: '10px', background: '#f4f4f4' }}>  
-                                      <img
-                                        src={acc.image_name ? `${BASE_URL}/uploads/accommodations/${acc.image_name}` : 'https://picsum.photos/id/57/2000/3000'}
-                                        alt={acc.name}
-                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                      />
+                <div className="mb-3 text-end text-secondary">
+                  พบ {visibleResults.length} รายการ
+                </div>
+                {Object.entries(groupedVisibleResults).map(
+                  ([typeName, accommodations]) => (
+                    <>
+                      <hr className="h-2" />
+                      <h2 className="mb-0 mt-2">{typeName}</h2>
+                      <div className="container mt-4 p-3 border rounded bg-light">
+                        {accommodations.map((acc) => (
+                          <div className="row">
+                            {/* Room Images */}
+                            <div className="col-md-4">
+                              <img
+                                src={
+                                  acc.image_name
+                                    ? `${BASE_URL}/uploads/accommodations/${acc.image_name}`
+                                    : "https://picsum.photos/id/57/2000/3000"
+                                }
+                                alt={acc.name}
+                                className="img-fluid rounded mb-2"
+                              />
+                              <div className="d-flex flex-wrap gap-2">
+                                <img
+                                  src="https://via.placeholder.com/90"
+                                  className="img-thumbnail"
+                                  alt="Thumb 1"
+                                />
+                                <img
+                                  src="https://via.placeholder.com/90"
+                                  className="img-thumbnail"
+                                  alt="Thumb 2"
+                                />
+                              </div>
+                              <ul className="feature-list">
+                                <li>
+                                  <Icon icon="la:bed" width="24" height="24" />
+                                  <span>1 เตียงควีนไซส์</span>
+                                </li>
+                                <li>
+                                  <Icon
+                                    icon="fluent:table-resize-column-16-regular"
+                                    width="27"
+                                    height="27"
+                                  />
+                                  ขนาดห้อง: 47 ตารางเมตร
+                                </li>
+                                <li>
+                                  <Icon
+                                    icon="cil:window"
+                                    width="27"
+                                    height="27"
+                                  />
+                                  วิว: สวน
+                                </li>
+                                <li>
+                                  <Icon
+                                    icon="mdi:bathroom"
+                                    width="27"
+                                    height="27"
+                                  />
+                                  ฝักบัวและอ่างอาบน้ำ
+                                </li>
+                                <li>
+                                  <Icon icon="fa:tv" width="27" height="27" />
+                                  โทรทัศน์
+                                </li>
+                              </ul>
+                            </div>
+
+                            {/* Facilities */}
+                            <div className="col-md-4">
+                              <h5 className="text-success mb-3">
+                                สิ่งอำนวยความสะดวก
+                              </h5>
+                              <ul className="feature-list">
+                                <li>
+                                  <Icon icon="fa:tv" width="20" height="20" />
+                                  รวมอาหารเช้า
+                                </li>
+                                <li>
+                                  <Icon
+                                    icon="hugeicons:hair-dryer"
+                                    width="20"
+                                    height="20"
+                                  />
+                                  ไดร์เป่าผม
+                                </li>
+                                <li>
+                                  <Icon
+                                    icon="streamline:parking-sign"
+                                    width="20"
+                                    height="20"
+                                  />
+                                  ที่จอดรถ
+                                </li>
+                                <li>
+                                  <Icon
+                                    icon="mage:wifi"
+                                    width="20"
+                                    height="20"
+                                  />
+                                  อินเทอร์เน็ตไร้สาย (Wi-Fi)
+                                </li>
+                                <li>
+                                  <Icon
+                                    icon="cil:fridge"
+                                    width="20"
+                                    height="20"
+                                  />
+                                  ตู้เย็น
+                                </li>
+                                <li>
+                                  <Icon
+                                    icon="iconoir:sandals"
+                                    width="20"
+                                    height="20"
+                                  />
+                                  รองเท้าเเตะ
+                                </li>
+                                <li>
+                                  <Icon
+                                    icon="iconoir:home-table"
+                                    width="20"
+                                    height="20"
+                                  />
+                                  โต๊ะทำงาน
+                                </li>
+                                <li>
+                                  <Icon
+                                    icon="hugeicons:tissue-paper"
+                                    width="20"
+                                    height="20"
+                                  />
+                                  กระดาษชำระ
+                                </li>
+                                <li>
+                                  <Icon
+                                    icon="hugeicons:umbrella"
+                                    width="20"
+                                    height="20"
+                                  />
+                                  ร่ม
+                                </li>
+                              </ul>
+                            </div>
+
+                            {/* Prices & Booking */}
+                            <div className="col-md-4">
+                              {promotions.map((promo, index) => (
+                                <div
+                                  key={index}
+                                  className="border rounded p-3 mb-3 bg-white"
+                                >
+                                  {promo.discount > 0 && (
+                                    <div className="text-success mb-2">
+                                      มีคูปองส่วนลด {promo.discount} บาท
                                     </div>
-                                    <div className="mt-2 d-flex flex-wrap align-items-center justify-content-center" style={{ fontSize: '0.97em', color: '#666' }}>
-                                      <span className="me-3"><i className="bi bi-people"></i> {acc.capacity || 2} คน</span>
-                                      <span className="me-3"><i className="bi bi-aspect-ratio"></i> {acc.room_size || '47 m²'}</span>
-                                      <span className="me-3"><i className="bi bi-wifi"></i></span>
-                                      <span className="me-3"><i className="bi bi-cup-straw"></i></span>
-                                    </div>
-                                  </Col>
-                                  <Col md={7}>
-                                    <Card.Body>
-                                      <Card key={acc.id} className="mb-3 border-0" style={{ background: '#fff', borderRadius: 10, boxShadow: '0 1px 4px #e0e0e0' }}>
-                                        <Card.Body className="py-2 px-3">
-                                          <div className="d-flex align-items-center mb-1">
-                                            <span className="fw-bold" style={{ fontSize: '1.05em', color: '#222' }}>
-                                              {acc.name}
-                                            </span>
-                                          </div>
-                                          <div className="mb-1" style={{ fontSize: '0.98em' }}>
-                                            <ul className='list-unstyled'>
-                                              {/* {acc.amenities.split(",").map((amenity, index) => (
-                                                <li key={index}>{amenity.trim()}</li>
-                                              ))} */}
-                                            </ul>
-                                          </div>
-                                          {/* <div className="mb-1" style={{ fontSize: '0.93em' }}>
-                                            <span className="fw-bold text-decoration-underline">Booking Condition</span> <br />
-                                            <span>{acc.description}</span>
-                                          </div> */}
-                                          <div className="d-flex align-items-center justify-content-between mt-2">
-                                            <DiscountedPrice accommodation={acc} />
-                                            {/* กล่องราคาจำลอง 3 กล่อง */}
-                                            <div className="mt-3">
-                                              {[1, 2, 3].map((i) => (
-                                                <Card key={i} className="mb-2 p-3 border shadow-sm" style={{ borderRadius: 10 }}>
-                                                  <div className="d-flex justify-content-between align-items-center">
-                                                    <div>
-                                                      <h6 className="fw-bold mb-1">รวมอาหารเช้า</h6>
-                                                      <div className="text-muted small mb-1">ยกเลิกฟรีก่อนวันเข้าพัก</div>
-                                                      <div className="d-flex align-items-baseline flex-wrap">
-                                                        <span className="text-decoration-line-through text-secondary me-2">9,000 บาท</span>
-                                                        <span className="text-danger fw-bold me-2">ลด 75%</span>
-                                                        <span className="fw-bold text-success">2,250 บาท</span>
-                                                      </div>
-                                                    </div>
-                                                    <Button variant="primary" style={{ minWidth: 80, borderRadius: 10 }}>จอง</Button>
-                                                  </div>
-                                                </Card>
-                                              ))}
-                                            </div>
-
-                                            {/* {availabilityData[acc.id] !== undefined (
-                                              <Button
-                                                variant="secondary"
-                                                disabled
-                                                style={{ minWidth: 100, borderRadius: 20 }}
-                                              >
-                                                ห้องเต็ม
-                                              </Button>
-                                            ) : (
-                                              <Button
-                                                variant="success"
-                                                style={{ minWidth: 100, borderRadius: 20 }}
-                                                onClick={""}
-                                              >
-                                                จองเลย
-                                              </Button>
-                                            )} */}
-                                          </div>
-
-                                          {/* แสดง Badge เฉพาะเมื่อห้องว่างมากกว่า 0 */}
-                                          {availabilityData[acc.id] !== undefined && availabilityData[acc.id] > 0 && (
-                                            <div className="mt-2">
-                                              <Badge bg="info" style={{ fontSize: '1em' }}>
-                                                ห้องว่าง: {availabilityData[acc.id]} ห้อง
-                                              </Badge>
-                                            </div>
-                                          )}
-
-                                        </Card.Body>
-                                      </Card>
-                                    </Card.Body>
-                                  </Col>
-                                </Row>
-                              </Card>
-                            </Col>
-                          ))}
-                        </Row>
-                      </Accordion.Body>
-                    </Accordion.Item>
-                  ))}
-                </Accordion>
+                                  )}
+                                  <div className="text-decoration-line-through text-muted">
+                                    9,000 บาท
+                                  </div>
+                                  <div className="h4 text-danger fw-bold">
+                                    {promo.price.toLocaleString()} บาท
+                                  </div>
+                                  <div className="text-muted">
+                                    ราคาต่อคืน (ก่อนรวมภาษีและค่าธรรมเนียม)
+                                  </div>
+                                  <button className="btn btn-primary mt-2 w-100">
+                                    จอง
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )
+                )}
               </>
             ) : (
               <div className="text-center text-muted py-5">

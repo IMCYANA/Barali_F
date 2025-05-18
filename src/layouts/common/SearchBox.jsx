@@ -111,7 +111,7 @@ export default function SearchBar({
               title={
                 <span>
                   <FaUserFriends className="me-2" />
-                  จำนวนผู้ใหญ่, เด็ก
+                  จำนวนผู้ใหญ่ และ เด็ก
                 </span>
               }
               variant="outline-secondary"
