@@ -33,7 +33,8 @@ const Popular = () => {
     const fetchPopularAccommodations = async () => {
         try {
             setLoading(true);
-            const res = await AccommodationService.getPopularAccommodation();
+            const res = await AccommodationService.getPopularRoom();
+            console.log(res);
             setPopulars(res?.data || []);
         } catch (error) {
             console.error("Error fetching popular accommodations:", error);

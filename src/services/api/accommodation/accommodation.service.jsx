@@ -3,7 +3,7 @@ import AuthHeader from "../../common/AuthHeader";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 
-const getPopularAccommodation = () => {
+const getPopularRoom = () => {
     return axios.get(`${BASE_URL}/api/accommodation/popular`);
 };
 
@@ -29,8 +29,8 @@ const getSearch = async (destination, checkIn, checkOut, guests) => {
     });
 }
 
-const getAvailability = (checkInDate, checkOutDate) => {
-  return axios.get(`${BASE_URL}/api/accommodation/availability`, {
+const getAvailableRooms = (checkInDate, checkOutDate) => {
+  return axios.get(`${BASE_URL}/api/accommodation/available`, {
     params: {
       check_in: checkInDate,
       check_out: checkOutDate
@@ -39,11 +39,11 @@ const getAvailability = (checkInDate, checkOutDate) => {
 }
 
 const AccommodationService = {
-    getPopularAccommodation,
+    getPopularRoom,
     getPromotion,
     getAll,
     getSearch,
-    getAvailability
+    getAvailableRooms
 }
 
 export default AccommodationService;

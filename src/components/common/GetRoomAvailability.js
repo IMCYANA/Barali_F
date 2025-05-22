@@ -11,7 +11,7 @@ const GetRooomAvailability = async (checkInDate, checkOutDate) => {
       return {};
     }
 
-    const res = await AccommodationService.getAvailability(
+    const res = await AccommodationService.getAvailableRooms(
       formattedCheckIn,
       formattedCheckOut
     );
