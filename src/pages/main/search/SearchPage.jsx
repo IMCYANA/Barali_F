@@ -131,10 +131,6 @@ const SearchPage = () => {
 
   const resetFilters = () => {
     setFilters({
-      priceRange: [0, 10000],
-      breakfast: false,
-      freeCancel: false,
-      highRating: false,
       selectedTypes: [],
     });
     setFilteredResults(originalResults);
