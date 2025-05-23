@@ -33,10 +33,6 @@ const SearchPage = () => {
   const [filteredResults, setFilteredResults] = useState([]);
   const [availabilityData, setAvailabilityData] = useState({});
   const [filters, setFilters] = useState({
-    priceRange: [0, 10000],
-    breakfast: false,
-    freeCancel: false,
-    highRating: false,
     selectedTypes: [],
   });
   // สร้าง ref เพื่อเก็บค่าวันที่เคยเรียกข้อมูลไปแล้ว
@@ -108,17 +104,9 @@ const SearchPage = () => {
 
       const filtered = originalResults.filter((acc) => {
         const price = acc.price_per_night || 0;
-        const inPriceRange = price >= priceRange[0] && price <= priceRange[1];
-        const matchBreakfast = !breakfast || acc.breakfastIncluded;
-        const matchFreeCancel = !freeCancel || acc.freeCancellation;
-        const matchHighRating = !highRating || (acc.rating && acc.rating >= 8);
         const matchType =
           selectedTypes.length === 0 || selectedTypes.includes(acc.type?.name);
         return (
-          inPriceRange &&
-          matchBreakfast &&
-          matchFreeCancel &&
-          matchHighRating &&
           matchType
         );
       });
@@ -216,11 +204,6 @@ const SearchPage = () => {
     );
   };
 
-  const promotions = [
-    { discount: 50, price: 2200 },
-    { discount: 42, price: 2208 },
-    { discount: 0, price: 2250 },
-  ];
   return (
     <Container className="my-4">
       <SearchBox resetFilter={resetFilters} />
@@ -421,30 +404,22 @@ const SearchPage = () => {
 
                             {/* Prices & Booking */}
                             <div className="col-md-4">
-                              {promotions.map((promo, index) => (
-                                <div
-                                  key={index}
-                                  className="border rounded p-3 mb-3 bg-white"
-                                >
-                                  {promo.discount > 0 && (
-                                    <div className="text-success mb-2">
-                                      มีคูปองส่วนลด {promo.discount} บาท
-                                    </div>
-                                  )}
-                                  <div className="text-decoration-line-through text-muted">
-                                    9,000 บาท
+                              <div className="border rounded p-3 mb-3 bg-white">
+                                {acc.discount > 0 && (
+                                  <div className="text-success mb-2">
+                                    มีคูปองส่วนลด {acc.discount}%
                                   </div>
-                                  <div className="h4 text-danger fw-bold">
-                                    {promo.price.toLocaleString()} บาท
-                                  </div>
-                                  <div className="text-muted">
-                                    ราคาต่อคืน (ก่อนรวมภาษีและค่าธรรมเนียม)
-                                  </div>
-                                  <button className="btn btn-primary mt-2 w-100">
-                                    จอง
-                                  </button>
+                                )}
+
+                                <DiscountedPrice accommodation={acc} />
+
+                                <div className="text-muted">
+                                  ราคาต่อคืน (ก่อนรวมภาษีและค่าธรรมเนียม)
                                 </div>
-                              ))}
+                                <button className="btn btn-primary mt-2 w-100">
+                                  จอง
+                                </button>
+                              </div>
                             </div>
                           </div>
                         ))}
