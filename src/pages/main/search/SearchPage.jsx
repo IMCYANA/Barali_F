@@ -12,7 +12,7 @@ import {
 } from "react-bootstrap";
 // import dayjs from "dayjs";
 import "dayjs/locale/th";
-import { useNavigate, } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useAuth from "../../../hooks/useAuth";
 import SearchBox from "../../../layouts/common/SearchBox";
 import LoginModal from "../../main/auth/LoginModal";
@@ -74,11 +74,11 @@ const SearchPage = () => {
       try {
         const res = destination
           ? await AccommodationService.getSearch(
-            checkIn,
-            checkOut,
-            adults,
-            children
-          )
+              checkIn,
+              checkOut,
+              adults,
+              children
+            )
           : await AccommodationService.getAll();
 
         setOriginalResults(res?.data || []);
@@ -176,12 +176,17 @@ const SearchPage = () => {
     if (!selectedAccommodation.some((a) => a.id === acc.id)) {
       const newSelection = [...selectedAccommodation, acc];
       setSelectedAccommodation(newSelection);
-      localStorage.setItem("selectedAccommodation", JSON.stringify(newSelection));
+      localStorage.setItem(
+        "selectedAccommodation",
+        JSON.stringify(newSelection)
+      );
     }
   };
 
   const handleRemoveRoom = (roomId) => {
-    const newSelection = selectedAccommodation.filter((room) => room.id !== roomId);
+    const newSelection = selectedAccommodation.filter(
+      (room) => room.id !== roomId
+    );
     setSelectedAccommodation(newSelection);
     localStorage.setItem("selectedAccommodation", JSON.stringify(newSelection));
   };
@@ -193,7 +198,7 @@ const SearchPage = () => {
       return userData.id;
     }
     return null;
-  }
+  };
   const userId = getUserId();
 
   const handleBookingClick = (acc) => {
@@ -213,15 +218,12 @@ const SearchPage = () => {
     }
   };
 
-
-
-
   // Discounted price component
   const DiscountedPrice = ({ accommodation }) => {
     const originalPrice = accommodation.price_per_night || 0;
-    const discountPercent = parseInt(accommodation.promotions[0]?.discount) || 0;
+    const discountPercent =
+      parseInt(accommodation.promotions[0]?.discount) || 0;
     const discounted = parseInt(getDiscountedPrice(accommodation));
-
 
     return (
       <div className="d-flex align-items-baseline mb-2">
@@ -236,8 +238,9 @@ const SearchPage = () => {
           </>
         )}
         <span
-          className={`h5 fw-bold ${discountPercent > 0 ? "text-danger" : "text-success"
-            }`}
+          className={`h5 fw-bold ${
+            discountPercent > 0 ? "text-danger" : "text-success"
+          }`}
         >
           {discounted.toLocaleString()} บาท
         </span>
@@ -254,9 +257,16 @@ const SearchPage = () => {
           <h5 className="fw-bold mb-3">รายการห้องที่คุณเลือก</h5>
           <ul className="list-group mb-3">
             {selectedAccommodation.map((room) => (
-              <li key={room.id} className="list-group-item d-flex justify-content-between align-items-center">
+              <li
+                key={room.id}
+                className="list-group-item d-flex justify-content-between align-items-center"
+              >
                 {room.name}
-                <Button variant="outline-danger" size="sm" onClick={() => handleRemoveRoom(room.id)}>
+                <Button
+                  variant="outline-danger"
+                  size="sm"
+                  onClick={() => handleRemoveRoom(room.id)}
+                >
                   ลบ
                 </Button>
               </li>
@@ -275,11 +285,9 @@ const SearchPage = () => {
                   adults,
                   children,
                 },
-              })
+              });
               localStorage.removeItem("selectedAccommodation");
-            }
-
-            }
+            }}
           >
             ยืนยันการจองทั้งหมด ({selectedAccommodation.length} ห้อง)
           </Button>
@@ -421,50 +429,56 @@ const SearchPage = () => {
 
                             {/* Facilities */}
                             <div className="col-md-4">
-                            {accommodations.map((acc) => {
-                              const toggleDropdown = (id) => {
-                                setExpandedFacilities((prev) => ({
-                                  ...prev,
-                                  [id]: !prev[id],
-                                }));
-                              };
+                              <ul
+                                className={`feature-list ${
+                                  expandedFacilities[acc.id]
+                                    ? "expanded"
+                                    : "collapsed"
+                                }`}
+                              >
+                                {acc.facilities
+                                  .slice(
+                                    0,
+                                    expandedFacilities[acc.id]
+                                      ? acc.facilities.length
+                                      : 5
+                                  )
+                                  .map((facility, index) => (
+                                    <li key={`acc-${acc.id}-fac-${index}`}>
+                                      <Icon
+                                        icon={facility.icon_name}
+                                        width="24"
+                                        height="24"
+                                      />
 
-                              const isExpanded = expandedFacilities[acc.id];
-                              const maxVisible = 5;
+                                      {facility.name}
+                                    </li>
+                                  ))}
 
-                              return (
-                                <div key={acc.id}>
-                                  <ul key={acc.id} className={`feature-list ${isExpanded ? "expanded" : "collapsed"}`}>
-                                    {acc.facilities.map((facility, index) => {
-                                      // แสดงเฉพาะ 5 อันแรก ถ้ายังไม่ expand
-                                      if (!isExpanded && index >= maxVisible) return null;
+                                {acc.facilities.length > 5 && (
+                                  <li
+                                    onClick={() => {
+                                      setExpandedFacilities((prev) => ({
+                                        ...prev,
 
-                                      return (
-                                        <li key={facility.id}>
-                                          <Icon icon={facility.icon_name} width="24" height="24" />
-                                          {facility.name}
-                                        </li>
-                                      );
-                                    })}
-
-                                    {/* แสดงปุ่ม dropdown หากมีเกิน 5 */}
-                                    {acc.facilities.length > maxVisible && (
-                                      <li
-                                        onClick={() => toggleDropdown(acc.id)}
-                                        style={{ cursor: "pointer" }}
-                                        className="dropdown-toggle-icon"
-                                      >
-                                        <Icon
-                                          icon={isExpanded ? "mdi:chevron-up" : "mdi:chevron-down"}
-                                          width="24"
-                                          height="24"
-                                        />
-                                      </li>
-                                    )}
-                                  </ul>
-                                </div>
-                              );
-                            })}
+                                        [acc.id]: !prev[acc.id],
+                                      }));
+                                    }}
+                                    style={{ cursor: "pointer" }}
+                                    className="dropdown-toggle-icon"
+                                  >
+                                    <Icon
+                                      icon={
+                                        expandedFacilities[acc.id]
+                                          ? "mdi:chevron-up"
+                                          : "mdi:chevron-down"
+                                      }
+                                      width="24"
+                                      height="24"
+                                    />
+                                  </li>
+                                )}
+                              </ul>
                             </div>
 
                             {/* Prices & Booking */}
@@ -485,9 +499,13 @@ const SearchPage = () => {
                                 <Button
                                   variant="success"
                                   onClick={() => handleAddToBooking(acc)}
-                                  disabled={selectedAccommodation.some((a) => a.id === acc.id)}
+                                  disabled={selectedAccommodation.some(
+                                    (a) => a.id === acc.id
+                                  )}
                                 >
-                                  {selectedAccommodation.some((a) => a.id === acc.id)
+                                  {selectedAccommodation.some(
+                                    (a) => a.id === acc.id
+                                  )
                                     ? "เพิ่มแล้ว"
                                     : "เพิ่มห้องนี้"}
                                 </Button>
@@ -519,7 +537,7 @@ const SearchPage = () => {
 
       <LoginModal
         show={showLoginModal}
-        handleClose={(handleCloseModal)}
+        handleClose={handleCloseModal}
         onLoginSuccess={() => {
           handleCloseModal();
           setTimeout(() => window.location.reload(), 300); // reload หลังปิด modal
