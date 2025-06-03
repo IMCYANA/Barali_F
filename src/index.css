@@ -1,0 +1,43 @@
+body {
+  font-family: 'Kanit', sans-serif;
+}
+
+.faded-placeholder::placeholder {
+  color: rgba(0, 0, 0, 0.4); /* เปลี่ยนค่า 0.4 ให้อ่อน/เข้มตามต้องการ */
+  opacity: 1; /* ต้องกำหนดไว้เพื่อให้ทำงานในบาง browser */
+}
+
+.feature-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  padding: 0;
+  margin: 15px 0;
+  list-style: none;
+  align-items: center;
+}
+
+.feature-list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #495057;
+  border-radius: 8px;
+  padding: 6px 12px;
+}
+
+.dropdown-toggle-icon {
+  font-weight: bold;
+  color: #007bff;
+}
+
+.feature-listS li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #495057;
+  border-radius: 8px;
+  padding: 6px 12px;
+}
