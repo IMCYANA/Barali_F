@@ -449,7 +449,6 @@ const SearchPage = () => {
 
                             {/* ส่วนที่ 3: ตัวเลือกราคา */}
                             <div className="col-md-4">
-                              <h5 className="mb-3">ตัวเลือกราคา</h5>
                               <div className="price-options-container">
                                 {accommodations.map((acc) => (
                                   <div
