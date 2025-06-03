@@ -458,15 +458,10 @@ const SearchPage = () => {
                                     <div className="d-flex justify-content-between align-items-start">
                                       <div>
                                         <h6 className="mb-2">{acc.name}</h6>
-                                        {acc.promotions?.[0]?.discount > 0 && (
-                                          <div className="text-success small mb-1">
-                                            ส่วนลด {acc.promotions[0]?.discount}
-                                            %
-                                          </div>
-                                        )}
+                                        {acc.promotions?.[0]?.discount > 0 }
                                         <DiscountedPrice accommodation={acc} />
                                         <div className="text-muted small">
-                                          ราคาต่อคืน (ก่อนภาษีและค่าธรรมเนียม)
+                                          ราคาต่อคืน (ก่อนรวมภาษีและค่าธรรมเนียม)
                                         </div>
                                       </div>
                                       <Button
