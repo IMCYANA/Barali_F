@@ -11,8 +11,8 @@ import {
   Alert,
 } from "react-bootstrap";
 import "dayjs/locale/th";
-import { useNavigate } from "react-router-dom";
-import useAuth from "../../../hooks/useAuth";
+// import { useNavigate } from "react-router-dom";
+// import useAuth from "../../../hooks/useAuth";
 import SearchBox from "../../../layouts/common/SearchBox";
 import LoginModal from "../../main/auth/LoginModal";
 import AccommodationService from "../../../services/api/accommodation/accommodation.service";
@@ -21,18 +21,19 @@ import FormatToBE from "../../../utils/FormatToBE";
 import { Icon } from "@iconify-icon/react";
 import "/src/css/SearchPage.css";
 import roomImageMap from "./roomImageMap";
+import { Medium } from "react-bootstrap-icons";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const SearchPage = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [types, setTypes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [originalResults, setOriginalResults] = useState([]);
 
-  const { isLoggedIn } = useAuth();
+  // const { isLoggedIn } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [selectedAccommodation, setSelectedAccommodation] = useState([]);
   const [expandedFacilities, setExpandedFacilities] = useState({});
@@ -193,14 +194,14 @@ const SearchPage = () => {
     }
   };
 
-  const getUserId = () => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      const userData = JSON.parse(user);
-      return userData.id;
-    }
-    return null;
-  };
+  // const getUserId = () => {
+  //   const user = localStorage.getItem("user");
+  //   if (user) {
+  //     const userData = JSON.parse(user);
+  //     return userData.id;
+  //   }
+  //   return null;
+  // };
 
   // Discounted price component
   const DiscountedPrice = ({ accommodation }) => {
@@ -210,25 +211,34 @@ const SearchPage = () => {
     const discounted = parseInt(getDiscountedPrice(accommodation));
 
     return (
-      <div className="d-flex align-items-baseline mb-2">
-        {discountPercent > 0 && (
-          <>
-            <span className="text-decoration-line-through text-secondary me-2">
-              {parseInt(originalPrice).toLocaleString()} บาท
-            </span>
-            <span className="text-danger fw-bold me-3">
-              ลด {discountPercent}%
-            </span>
-          </>
-        )}
+      <>
+        <div className="d-flex align-items-baseline mb-2">
+          {discountPercent > 0 && (
+            <>
+              <span
+                className="text-decoration-line-through text-secondary me-2 small"
+                style={{ whiteSpace: "nowrap" }}
+              >
+                {parseInt(originalPrice).toLocaleString()} บาท
+              </span>
+              <span
+                className="text-danger fw-bold me-1"
+                style={{ whiteSpace: "nowrap" }}
+              >
+                -{discountPercent}%
+              </span>
+            </>
+          )}
+        </div>
         <span
           className={`h5 fw-bold ${
             discountPercent > 0 ? "text-danger" : "text-success"
           }`}
+          style={{ whiteSpace: "nowrap" }}
         >
           {discounted.toLocaleString()} บาท
         </span>
-      </div>
+      </>
     );
   };
 
@@ -316,10 +326,10 @@ const SearchPage = () => {
                         <hr className="h-2" />
                         <h2 className="mb-0 mt-2">{typeName}</h2>
 
-                        <div className="container mt-4 p-3 border rounded bg-light">
+                        <div className="container mt-4 border rounded bg-light">
                           <div className="row">
                             {/* ส่วนที่ 1: รูปภาพและข้อมูลห้อง */}
-                            <div className="col-md-4">
+                            <div className="col-md-4 bg-info bg-opacity-10 py-3 border-end">
                               <img
                                 src={
                                   representativeAcc.image_name
@@ -372,7 +382,7 @@ const SearchPage = () => {
                                 </li>
                                 <li>
                                   <Icon
-                                    icon="fluent:table-resize-column-16-regular"
+                                    icon="ri:custom-size"
                                     width="27"
                                     height="27"
                                   />
@@ -390,8 +400,18 @@ const SearchPage = () => {
                             </div>
 
                             {/* ส่วนที่ 2: สิ่งอำนวยความสะดวก */}
-                            <div className="col-md-4">
-                              <h5 className="mb-3">สิ่งอำนวยความสะดวก</h5>
+                            <div className="col-md-4 mt-3 ps-0">
+                              <h5
+                                className="mb-3 rounded-end fw-light"
+                                style={{
+                                  backgroundColor: "rgba(113, 191, 68, 1)",
+                                  color: "white",
+                                  padding: "0.5rem 1rem",
+                                }}
+                              >
+                                สิ่งอำนวยความสะดวก
+                              </h5>
+
                               <ul
                                 className={`feature-listS ${
                                   expandedFacilities[representativeAcc.id]
@@ -448,25 +468,26 @@ const SearchPage = () => {
                             </div>
 
                             {/* ส่วนที่ 3: ตัวเลือกราคา */}
-                            <div className="col-md-4">
-                              <div className="price-options-container">
+                            <div className="col-md-4 border-start bg-white">
+                              <div className="price-options-container ">
                                 {accommodations.map((acc) => (
                                   <div
                                     key={acc.id}
-                                    className="price-option-card mb-3 p-3 border rounded bg-white"
+                                    className="price-option-card mb-3 mt-3 p-3 border-bottom bg-white"
                                   >
                                     <div className="d-flex justify-content-between align-items-start">
                                       <div>
-                                        <h6 className="mb-2">{acc.name}</h6>
-                                        {acc.promotions?.[0]?.discount > 0 }
+                                        {acc.promotions?.[0]?.discount > 0}
                                         <DiscountedPrice accommodation={acc} />
                                         <div className="text-muted small">
-                                          ราคาต่อคืน (ก่อนรวมภาษีและค่าธรรมเนียม)
+                                          ราคาต่อคืน
+                                          (ก่อนรวมภาษีและค่าธรรมเนียม)
                                         </div>
                                       </div>
                                       <Button
-                                        variant="success"
+                                        variant="info"
                                         size="sm"
+                                        className="text-white mt-auto"
                                         onClick={() => handleAddToBooking(acc)}
                                         disabled={selectedAccommodation.some(
                                           (a) => a.id === acc.id
