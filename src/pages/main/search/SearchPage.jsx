@@ -9,10 +9,9 @@ import {
   Form,
   Spinner,
   Alert,
+  InputGroup,
 } from "react-bootstrap";
 import "dayjs/locale/th";
-// import { useNavigate } from "react-router-dom";
-// import useAuth from "../../../hooks/useAuth";
 import SearchBox from "../../../layouts/common/SearchBox";
 import LoginModal from "../../main/auth/LoginModal";
 import AccommodationService from "../../../services/api/accommodation/accommodation.service";
@@ -21,22 +20,19 @@ import FormatToBE from "../../../utils/FormatToBE";
 import { Icon } from "@iconify-icon/react";
 import "/src/css/SearchPage.css";
 import roomImageMap from "./roomImageMap";
-import { Medium } from "react-bootstrap-icons";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const SearchPage = () => {
-  // const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [types, setTypes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [originalResults, setOriginalResults] = useState([]);
-
-  // const { isLoggedIn } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [selectedAccommodation, setSelectedAccommodation] = useState([]);
   const [expandedFacilities, setExpandedFacilities] = useState({});
+  const [quantityMap, setQuantityMap] = useState({});
 
   // Get search parameters
   const destination = searchParams.get("destination") || "test";
@@ -183,30 +179,43 @@ const SearchPage = () => {
   }, []);
 
   const handleAddToBooking = (acc) => {
-
-     if (selectedAccommodation.length >= 9) {
-    alert("คุณสามารถเลือกห้องพักได้ไม่เกิน 9 ห้องเท่านั้น");
-    return;
-  }
-    if (!selectedAccommodation.some((a) => a.id === acc.id)) {
-      const newSelection = [...selectedAccommodation, acc];
-      setSelectedAccommodation(newSelection);
-      localStorage.setItem(
-        "selectedAccommodation",
-        JSON.stringify(newSelection)
-      );
-      window.dispatchEvent(new Event("accommodationChanged"));
+    const totalSelected = selectedAccommodation.filter(a => a.id === acc.id).length;
+    const quantity = quantityMap[acc.id] || 1;
+    
+    if (totalSelected + quantity > 9) {
+      alert("คุณสามารถเลือกห้องพักได้ไม่เกิน 9 ห้องเท่านั้น");
+      return;
     }
+    
+    const newSelection = [...selectedAccommodation];
+    for (let i = 0; i < quantity; i++) {
+      newSelection.push(acc);
+    }
+    
+    setSelectedAccommodation(newSelection);
+    localStorage.setItem(
+      "selectedAccommodation",
+      JSON.stringify(newSelection)
+    );
+    window.dispatchEvent(new Event("accommodationChanged"));
   };
 
-  // const getUserId = () => {
-  //   const user = localStorage.getItem("user");
-  //   if (user) {
-  //     const userData = JSON.parse(user);
-  //     return userData.id;
-  //   }
-  //   return null;
-  // };
+  const handleRemoveFromBooking = (accId) => {
+    const newSelection = selectedAccommodation.filter(a => a.id !== accId);
+    setSelectedAccommodation(newSelection);
+    localStorage.setItem(
+      "selectedAccommodation",
+      JSON.stringify(newSelection)
+    );
+    window.dispatchEvent(new Event("accommodationChanged"));
+  };
+
+  const handleQuantityChange = (accId, value) => {
+    setQuantityMap(prev => ({
+      ...prev,
+      [accId]: Math.max(1, Math.min(9, value))
+    }));
+  };
 
   // Discounted price component
   const DiscountedPrice = ({ accommodation }) => {
@@ -244,6 +253,194 @@ const SearchPage = () => {
           {discounted.toLocaleString()} บาท
         </span>
       </>
+    );
+  };
+
+  // Room card component
+  const RoomCard = ({ room }) => {
+    const isSelected = selectedAccommodation.some(a => a.id === room.id);
+    const selectedCount = selectedAccommodation.filter(a => a.id === room.id).length;
+    const quantity = quantityMap[room.id] || 1;
+    const roomTypeName = room.type?.name || "Standard";
+
+    return (
+      <div className="room-card mb-4 p-3 border rounded bg-white">
+        <Row>
+          {/* ส่วนซ้าย - รูปภาพและข้อมูลห้อง */}
+          <Col md={5}>
+            {/* รูปหลัก */}
+            <div className="mb-3">
+              <img
+                src={room.image_name 
+                  ? `${BASE_URL}/uploads/accommodations/${room.image_name}`
+                  : "https://picsum.photos/id/57/2000/3000"}
+                alt={room.name}
+                className="img-fluid rounded mb-2"
+                style={{
+                  aspectRatio: "4 / 3",
+                  width: "100%",
+                  height: "220px",
+                  objectFit: "cover",
+                }}
+              />
+            </div>
+            
+            {/* Thumbnail Images */}
+            <div className="d-flex flex-wrap gap-2 mb-3">
+              {(roomImageMap[roomTypeName] || []).map((img, idx) => (
+                <img
+                  key={idx}
+                  src={`/images/rooms/${img}`}
+                  alt={`${roomTypeName} thumbnail ${idx + 1}`}
+                  className="rounded-2 object-fit-cover"
+                  style={{
+                    aspectRatio: "4 / 3",
+                    width: "80px",
+                    height: "60px",
+                    objectFit: "cover",
+                    border: "1px solid #ddd"
+                  }}
+                  onError={(e) => {
+                    e.target.src = "/images/rooms/default-thumb.jpg";
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* ข้อมูลห้องพัก */}
+            <div className="room-features-container p-3 bg-light rounded">
+              <h5 className="mb-2">ข้อมูลห้องพัก</h5>
+              <ul className="feature-list">
+                <li>
+                  <Icon icon="la:bed" width="24" height="24" />
+                  <span>1 เตียงควีนไซส์</span>
+                </li>
+                <li>
+                  <Icon icon="ri:custom-size" width="24" height="24" />
+                  <span>ขนาดห้อง: 47 ตารางเมตร</span>
+                </li>
+                <li>
+                  <Icon icon="cil:window" width="24" height="24" />
+                  <span>วิว: สวน</span>
+                </li>
+              </ul>
+            </div>
+          </Col>
+
+          {/* ส่วนกลาง - สิ่งอำนวยความสะดวก */}
+          <Col md={4}>
+            <div className="facilities-container h-100">
+              <h5 className="mb-3">สิ่งอำนวยความสะดวก</h5>
+              <ul
+                className={`feature-listS ${
+                  expandedFacilities[room.id] ? "expanded" : "collapsed"
+                }`}
+              >
+                {room.facilities
+                  .slice(
+                    0,
+                    expandedFacilities[room.id] ? room.facilities.length : 5
+                  )
+                  .map((facility, index) => (
+                    <li key={`acc-${room.id}-fac-${index}`}>
+                      <Icon icon={facility.icon_name} width="20" height="20" />
+                      {facility.name}
+                    </li>
+                  ))}
+                {room.facilities.length > 5 && (
+                  <li
+                    onClick={() => {
+                      setExpandedFacilities((prev) => ({
+                        ...prev,
+                        [room.id]: !prev[room.id],
+                      }));
+                    }}
+                    style={{ cursor: "pointer" }}
+                    className="dropdown-toggle-icon"
+                  >
+                    <Icon
+                      icon={
+                        expandedFacilities[room.id]
+                          ? "mdi:chevron-up"
+                          : "mdi:chevron-down"
+                      }
+                      width="20"
+                      height="20"
+                    />
+                    {expandedFacilities[room.id]
+                      ? "แสดงน้อยลง"
+                      : "แสดงเพิ่มเติม"}
+                  </li>
+                )}
+              </ul>
+            </div>
+          </Col>
+
+          {/* ส่วนขวา - ราคาและการจอง */}
+          <Col md={3} className="border-start">
+            <div className="d-flex flex-column h-100">
+              <div className="mb-3">
+                <DiscountedPrice accommodation={room} />
+                <div className="text-muted small">
+                  ราคาต่อคืน (ก่อนรวมภาษีและค่าธรรมเนียม)
+                </div>
+              </div>
+
+              <div className="mt-auto">
+                {!isSelected ? (
+                  <div className="d-flex align-items-center">
+                    <InputGroup size="sm" style={{ width: '120px' }}>
+                      <Button 
+                        variant="outline-secondary" 
+                        onClick={() => handleQuantityChange(room.id, quantity - 1)}
+                        disabled={quantity <= 1}
+                      >
+                        -
+                      </Button>
+                      <Form.Control
+                        type="number"
+                        min="1"
+                        max="9"
+                        value={quantity}
+                        onChange={(e) => handleQuantityChange(room.id, parseInt(e.target.value) || 1)}
+                        className="text-center"
+                      />
+                      <Button 
+                        variant="outline-secondary" 
+                        onClick={() => handleQuantityChange(room.id, quantity + 1)}
+                        disabled={quantity >= 9}
+                      >
+                        +
+                      </Button>
+                    </InputGroup>
+                    <Button
+                      variant="info"
+                      size="sm"
+                      className="text-white ms-2"
+                      onClick={() => handleAddToBooking(room)}
+                    >
+                      เพิ่ม
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="d-flex flex-column align-items-end">
+                    <span className="text-success small mb-1">
+                      {selectedCount} ห้องที่เลือก
+                    </span>
+                    <Button
+                      variant="outline-danger"
+                      size="sm"
+                      onClick={() => handleRemoveFromBooking(room.id)}
+                    >
+                      ยกเลิก
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </Col>
+        </Row>
+      </div>
     );
   };
 
@@ -323,197 +520,16 @@ const SearchPage = () => {
                 </div>
 
                 {Object.entries(groupedResults).map(
-                  ([typeName, accommodations]) => {
-                    const representativeAcc = accommodations[0];
+                  ([typeName, accommodations]) => (
+                    <div key={typeName} className="mb-5">
+                      <hr className="h-2" />
+                      <h2 className="mb-4">{typeName}</h2>
 
-                    return (
-                      <div key={typeName} className="mb-5">
-                        <hr className="h-2" />
-                        <h2 className="mb-0 mt-2">{typeName}</h2>
-
-                        <div className="container mt-4 border rounded bg-light">
-                          <div className="row">
-                            {/* ส่วนที่ 1: รูปภาพและข้อมูลห้อง */}
-                            <div className="col-md-4 bg-info bg-opacity-10 py-3 border-end">
-                              <img
-                                src={
-                                  representativeAcc.image_name
-                                    ? `${BASE_URL}/uploads/accommodations/${representativeAcc.image_name}`
-                                    : "https://picsum.photos/id/57/2000/3000"
-                                }
-                                alt={representativeAcc.name}
-                                className="img-fluid rounded mb-2"
-                                style={{
-                                  aspectRatio: "4 / 3",
-                                  maxWidth: "100%",
-                                  maxHeight: "220px",
-                                  objectFit: "cover",
-                                }}
-                              />
-
-                              {/* Thumbnail Images */}
-                              <div className="d-flex flex-wrap gap-2 mb-2">
-                                {(
-                                  roomImageMap[representativeAcc.type?.name] ||
-                                  []
-                                ).map((img, idx) => (
-                                  <img
-                                    key={idx}
-                                    src={`/images/rooms/${img}`}
-                                    alt={`${
-                                      representativeAcc.type?.name
-                                    } thumbnail ${idx + 1}`}
-                                    className="rounded-2 object-fit-cover"
-                                    style={{
-                                      aspectRatio: "4 / 3",
-                                      maxWidth: "115px",
-                                      maxHeight: "100px",
-                                      objectFit: "cover",
-                                      borderRadius: "1rem",
-                                    }}
-                                    onError={(e) => {
-                                      e.target.src =
-                                        "/images/rooms/default-thumb.jpg";
-                                    }}
-                                  />
-                                ))}
-                              </div>
-
-                              {/* Room Features */}
-                              <ul className="feature-list mt-3">
-                                <li>
-                                  <Icon icon="la:bed" width="24" height="24" />
-                                  <span>1 เตียงควีนไซส์</span>
-                                </li>
-                                <li>
-                                  <Icon
-                                    icon="ri:custom-size"
-                                    width="27"
-                                    height="27"
-                                  />
-                                  ขนาดห้อง: 47 ตารางเมตร
-                                </li>
-                                <li>
-                                  <Icon
-                                    icon="cil:window"
-                                    width="27"
-                                    height="27"
-                                  />
-                                  วิว: สวน
-                                </li>
-                              </ul>
-                            </div>
-
-                            {/* ส่วนที่ 2: สิ่งอำนวยความสะดวก */}
-                            <div className="col-md-4 mt-3 ps-0">
-                              <h5
-                                className="mb-3 rounded-end fw-light"
-                                style={{
-                                  backgroundColor: "rgba(113, 191, 68, 1)",
-                                  color: "white",
-                                  padding: "0.5rem 1rem",
-                                }}
-                              >
-                                สิ่งอำนวยความสะดวก
-                              </h5>
-
-                              <ul
-                                className={`feature-listS ${
-                                  expandedFacilities[representativeAcc.id]
-                                    ? "expanded"
-                                    : "collapsed"
-                                }`}
-                              >
-                                {representativeAcc.facilities
-                                  .slice(
-                                    0,
-                                    expandedFacilities[representativeAcc.id]
-                                      ? representativeAcc.facilities.length
-                                      : 5
-                                  )
-                                  .map((facility, index) => (
-                                    <li
-                                      key={`acc-${representativeAcc.id}-fac-${index}`}
-                                    >
-                                      <Icon
-                                        icon={facility.icon_name}
-                                        width="24"
-                                        height="24"
-                                      />
-                                      {facility.name}
-                                    </li>
-                                  ))}
-                                {representativeAcc.facilities.length > 5 && (
-                                  <li
-                                    onClick={() => {
-                                      setExpandedFacilities((prev) => ({
-                                        ...prev,
-                                        [representativeAcc.id]:
-                                          !prev[representativeAcc.id],
-                                      }));
-                                    }}
-                                    style={{ cursor: "pointer" }}
-                                    className="dropdown-toggle-icon"
-                                  >
-                                    <Icon
-                                      icon={
-                                        expandedFacilities[representativeAcc.id]
-                                          ? "mdi:chevron-up"
-                                          : "mdi:chevron-down"
-                                      }
-                                      width="24"
-                                      height="24"
-                                    />
-                                    {expandedFacilities[representativeAcc.id]
-                                      ? "แสดงน้อยลง"
-                                      : "แสดงเพิ่มเติม"}
-                                  </li>
-                                )}
-                              </ul>
-                            </div>
-
-                            {/* ส่วนที่ 3: ตัวเลือกราคา */}
-                            <div className="col-md-4 border-start bg-white">
-                              <div className="price-options-container ">
-                                {accommodations.map((acc) => (
-                                  <div
-                                    key={acc.id}
-                                    className="price-option-card mb-3 mt-3 p-3 border-bottom bg-white"
-                                  >
-                                    <div className="d-flex justify-content-between align-items-start">
-                                      <div>
-                                        {acc.promotions?.[0]?.discount > 0}
-                                        <DiscountedPrice accommodation={acc} />
-                                        <div className="text-muted small">
-                                          ราคาต่อคืน
-                                          (ก่อนรวมภาษีและค่าธรรมเนียม)
-                                        </div>
-                                      </div>
-                                      <Button
-                                        variant="info"
-                                        size="sm"
-                                        className="text-white mt-auto"
-                                        onClick={() => handleAddToBooking(acc)}
-                                        disabled={selectedAccommodation.some(
-                                          (a) => a.id === acc.id
-                                        )}
-                                      >
-                                        {selectedAccommodation.some(
-                                          (a) => a.id === acc.id
-                                        )
-                                          ? "เพิ่มแล้ว"
-                                          : "เพิ่ม"}
-                                      </Button>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  }
+                      {accommodations.map((room) => (
+                        <RoomCard key={room.id} room={room} />
+                      ))}
+                    </div>
+                  )
                 )}
               </>
             ) : (
