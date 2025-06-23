@@ -179,41 +179,37 @@ const SearchPage = () => {
   }, []);
 
   const handleAddToBooking = (acc) => {
-    const totalSelected = selectedAccommodation.filter(a => a.id === acc.id).length;
+    const totalSelected = selectedAccommodation.filter(
+      (a) => a.id === acc.id
+    ).length;
     const quantity = quantityMap[acc.id] || 1;
-    
+
     if (totalSelected + quantity > 9) {
       alert("คุณสามารถเลือกห้องพักได้ไม่เกิน 9 ห้องเท่านั้น");
       return;
     }
-    
+
     const newSelection = [...selectedAccommodation];
     for (let i = 0; i < quantity; i++) {
       newSelection.push(acc);
     }
-    
+
     setSelectedAccommodation(newSelection);
-    localStorage.setItem(
-      "selectedAccommodation",
-      JSON.stringify(newSelection)
-    );
+    localStorage.setItem("selectedAccommodation", JSON.stringify(newSelection));
     window.dispatchEvent(new Event("accommodationChanged"));
   };
 
   const handleRemoveFromBooking = (accId) => {
-    const newSelection = selectedAccommodation.filter(a => a.id !== accId);
+    const newSelection = selectedAccommodation.filter((a) => a.id !== accId);
     setSelectedAccommodation(newSelection);
-    localStorage.setItem(
-      "selectedAccommodation",
-      JSON.stringify(newSelection)
-    );
+    localStorage.setItem("selectedAccommodation", JSON.stringify(newSelection));
     window.dispatchEvent(new Event("accommodationChanged"));
   };
 
   const handleQuantityChange = (accId, value) => {
-    setQuantityMap(prev => ({
+    setQuantityMap((prev) => ({
       ...prev,
-      [accId]: Math.max(1, Math.min(9, value))
+      [accId]: Math.max(1, Math.min(9, value)),
     }));
   };
 
@@ -258,8 +254,10 @@ const SearchPage = () => {
 
   // Room card component
   const RoomCard = ({ room }) => {
-    const isSelected = selectedAccommodation.some(a => a.id === room.id);
-    const selectedCount = selectedAccommodation.filter(a => a.id === room.id).length;
+    const isSelected = selectedAccommodation.some((a) => a.id === room.id);
+    const selectedCount = selectedAccommodation.filter(
+      (a) => a.id === room.id
+    ).length;
     const quantity = quantityMap[room.id] || 1;
     const roomTypeName = room.type?.name || "Standard";
 
@@ -271,9 +269,11 @@ const SearchPage = () => {
             {/* รูปหลัก */}
             <div className="mb-3">
               <img
-                src={room.image_name 
-                  ? `${BASE_URL}/uploads/accommodations/${room.image_name}`
-                  : "https://picsum.photos/id/57/2000/3000"}
+                src={
+                  room.image_name
+                    ? `${BASE_URL}/uploads/accommodations/${room.image_name}`
+                    : "https://picsum.photos/id/57/2000/3000"
+                }
                 alt={room.name}
                 className="img-fluid rounded mb-2"
                 style={{
@@ -284,7 +284,7 @@ const SearchPage = () => {
                 }}
               />
             </div>
-            
+
             {/* Thumbnail Images */}
             <div className="d-flex flex-wrap gap-2 mb-3">
               {(roomImageMap[roomTypeName] || []).map((img, idx) => (
@@ -298,7 +298,7 @@ const SearchPage = () => {
                     width: "80px",
                     height: "60px",
                     objectFit: "cover",
-                    border: "1px solid #ddd"
+                    border: "1px solid #ddd",
                   }}
                   onError={(e) => {
                     e.target.src = "/images/rooms/default-thumb.jpg";
@@ -310,20 +310,11 @@ const SearchPage = () => {
             {/* ข้อมูลห้องพัก */}
             <div className="room-features-container p-3 bg-light rounded">
               <h5 className="mb-2">ข้อมูลห้องพัก</h5>
-              <ul className="feature-list">
-                <li>
-                  <Icon icon="la:bed" width="24" height="24" />
-                  <span>1 เตียงควีนไซส์</span>
-                </li>
-                <li>
-                  <Icon icon="ri:custom-size" width="24" height="24" />
-                  <span>ขนาดห้อง: 47 ตารางเมตร</span>
-                </li>
-                <li>
-                  <Icon icon="cil:window" width="24" height="24" />
-                  <span>วิว: สวน</span>
-                </li>
-              </ul>
+              {room.description ? (
+                <p style={{ whiteSpace: "pre-line" }}>{room.description}</p>
+              ) : (
+                <p className="text-muted">ไม่มีข้อมูลห้องพัก</p>
+              )}
             </div>
           </Col>
 
@@ -389,10 +380,12 @@ const SearchPage = () => {
               <div className="mt-auto">
                 {!isSelected ? (
                   <div className="d-flex align-items-center">
-                    <InputGroup size="sm" style={{ width: '120px' }}>
-                      <Button 
-                        variant="outline-secondary" 
-                        onClick={() => handleQuantityChange(room.id, quantity - 1)}
+                    <InputGroup size="sm" style={{ width: "120px" }}>
+                      <Button
+                        variant="outline-secondary"
+                        onClick={() =>
+                          handleQuantityChange(room.id, quantity - 1)
+                        }
                         disabled={quantity <= 1}
                       >
                         -
@@ -402,12 +395,19 @@ const SearchPage = () => {
                         min="1"
                         max="9"
                         value={quantity}
-                        onChange={(e) => handleQuantityChange(room.id, parseInt(e.target.value) || 1)}
+                        onChange={(e) =>
+                          handleQuantityChange(
+                            room.id,
+                            parseInt(e.target.value) || 1
+                          )
+                        }
                         className="text-center"
                       />
-                      <Button 
-                        variant="outline-secondary" 
-                        onClick={() => handleQuantityChange(room.id, quantity + 1)}
+                      <Button
+                        variant="outline-secondary"
+                        onClick={() =>
+                          handleQuantityChange(room.id, quantity + 1)
+                        }
                         disabled={quantity >= 9}
                       >
                         +
